@@ -8,15 +8,14 @@
 const char *__asan_default_options(void);
 const char *__ubsan_default_options(void);
 
-#define SANITIZER_OPTIONS "abort_on_error=1:" \
-			  "disable_coredump=0"
-
 const char *__asan_default_options(void)
 {
-	return SANITIZER_OPTIONS;
+	return "abort_on_error=1:"
+	       "disable_coredump=0";
 }
 
 const char *__ubsan_default_options(void)
 {
-	return SANITIZER_OPTIONS;
+	return "abort_on_error=1:"
+	       "disable_coredump=0";
 }

@@ -49,6 +49,7 @@ lib-obj-y += build/lib/atexit.o \
 	     build/lib/log.o \
 	     build/lib/parse_argv.o \
 	     build/lib/rio.o \
+	     build/lib/sanitizer.o \
 	     build/lib/strbuf.o \
 	     build/lib/strlist.o \
 	     build/lib/strtox.o \
