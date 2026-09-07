@@ -1,0 +1,13 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+/build
+/deps
+/scripts/__pycache__
+
+/command/**/*_entry.c
+/include/command/*
+/include/config/*
+/include/generated/*
+
+/lib/unicode_width.c
+/EastAsianWidth.txt

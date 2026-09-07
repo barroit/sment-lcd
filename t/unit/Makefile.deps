@@ -1,0 +1,7 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+build/t/unit/strbuf.run: build/t/unit/strbuf_prealloc.run
+
+build/t/unit/strbuf_alloc.run: build/t/unit/log.run
+
+build/t/unit/log.run: build/t/unit/strbuf_prealloc.run

@@ -1,0 +1,46 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+ifneq ($(filter build/t/unit/run build/t/unit/%.run,$(MAKECMDGOALS)),)
+  MAKEFLAGS += -s
+endif
+
+CFLAGS += -iquote t/unit/include
+
+ut-lib-y := build/t/unit/lib/main.o
+ut-unit-y := build/t/unit/log.o \
+	     build/t/unit/strbuf.o \
+	     build/t/unit/strbuf_alloc.o \
+	     build/t/unit/strbuf_prealloc.o \
+	     build/t/unit/strlist.o \
+	     build/t/unit/strtox.o \
+	     build/t/unit/strutil.o \
+	     build/t/unit/unicode.o
+
+ut-y := $(ut-unit-y:.o=.run)
+
+include t/unit/Makefile.deps
+
+-include $(ut-unit-y:.o=.d)
+
+.PHONY: build/t/unit/run
+
+build/t/unit/run: $(ut-y)
+
+$(ut-y):
+
+build/t/unit/%.bin: build/t/unit/%.o $(ut-lib-y) $(lib-obj-y) $(link-y)
+	mkdir -p $(@D)
+	$(CC) -fuse-ld=$(LD) $(LDFLAGS) $^ -o $@
+
+$(ut-unit-y):
+
+$(ut-lib-y):
+
+build/t/unit/%.run: build/t/unit/%.bin
+	printf '%s\n' $(patsubst %.run,%.pass,$(filter %.run,$^)) >$<.deps
+	rm -f $(patsubst %.bin,%.pass,$<)
+	printf '\n== %s\n' $<
+	env time -p $< $<.deps 2>$<.err | ./tapview/tapview && \
+	touch $(patsubst %.bin,%.pass,$<) || true
+	printf '\n'
+	cat $<.err

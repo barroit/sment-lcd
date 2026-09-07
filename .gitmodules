@@ -1,0 +1,10 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+[submodule "kconfiglib"]
+	path = kconfiglib
+	url = git@github.com:zephyrproject-rtos/Kconfiglib.git
+
+[submodule "tapview"]
+	path = tapview
+	url = git@gitlab.com:esr/tapview.git
+	ignore = dirty

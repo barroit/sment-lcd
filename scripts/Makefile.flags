@@ -1,0 +1,84 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+CFLAGS :=
+LDFLAGS :=
+
+CFLAGS += -std=gnu17
+
+ifneq ($(USE_CLANG),)
+  LDFLAGS += --ld-path=$$(cat build/probe/ld/program)
+else ifneq ($(USE_GCC),)
+  LDFLAGS += -B$(shell dirname $$(cat build/probe/ld/program))
+endif
+
+ifneq ($(CONFIG_CC_OPTIMIZE_NONE),)
+  CFLAGS += -O0
+else ifneq ($(CONFIG_CC_OPTIMIZE_O1),)
+  CFLAGS += -O1
+else ifneq ($(CONFIG_CC_OPTIMIZE_O2),)
+  CFLAGS += -O2
+else ifneq ($(CONFIG_CC_OPTIMIZE_O3),)
+  CFLAGS += -O3
+endif
+
+ifneq ($(CONFIG_DEBUG_INFO_DWARF4),)
+  CFLAGS += -gdwarf-4
+else ifneq ($(CONFIG_DEBUG_INFO_DWARF5),)
+  CFLAGS += -gdwarf-5
+endif
+
+ifneq ($(CONFIG_ENABLE_DEBUG),)
+  CFLAGS += -fno-omit-frame-pointer
+endif
+
+ifneq ($(CONFIG_DEBUG_INFO_COMPRESS_ZLIB),)
+  CFLAGS += -gz=zlib
+  LDFLAGS += -Wl,--compress-debug-sections=zlib
+else ifneq ($(CONFIG_DEBUG_INFO_COMPRESS_ZSTD),)
+  CFLAGS += -gz=zstd
+  LDFLAGS += -Wl,--compress-debug-sections=zstd
+endif
+
+ifneq ($(CONFIG_ENABLE_SANITIZER),)
+  CFLAGS += -fsanitize=address,undefined
+  LDFLAGS += -fsanitize=address,undefined
+endif
+
+ifneq ($(and $(CONFIG_ENABLE_TEST),$(CC_HAS_TOPLEVEL_REORDER)),)
+  CFLAGS += -fno-toplevel-reorder
+endif
+
+CFLAGS += -funsigned-char
+
+CFLAGS += -MMD -MP
+
+CFLAGS += -Wall \
+	  -Wbad-function-cast \
+	  -Wformat-security \
+	  -Winit-self \
+	  -Wmissing-declarations \
+	  -Wmissing-prototypes \
+	  -Wnested-externs \
+	  -Wno-system-headers \
+	  -Wold-style-definition \
+	  -Wpacked \
+	  -Wstrict-prototypes \
+	  -Wno-switch \
+	  -Wshadow
+
+CFLAGS += -Wno-parentheses
+
+CFLAGS += -iquote include
+
+CFLAGS += -include include/generated/config.h
+
+CFLAGS += -D_GNU_SOURCE
+
+ifeq ($(CONFIG_ENABLE_DEBUG),)
+  CFLAGS += -DNDEBUG
+endif
+
+build/.flags.%: .force
+	@trap 'rm -f .tmp-$$$$' EXIT && \
+	printf '%s\n' "$(CFLAGS)" >.tmp-$$$$ && \
+	$(call mv_stale,.tmp-$$$$,$(@),)

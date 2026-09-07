@@ -1,0 +1,15 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+kconfiglib := KCONFIG_FUNCTIONS=kconfig PYTHONPATH=$(CURDIR)/scripts \
+	      KCONFIG_CONFIG=build/.config ./kconfiglib
+
+.PHONY: menuconfig
+
+menuconfig: bootstrap
+	MENUCONFIG_STYLE=aquatic $(kconfiglib)/menuconfig.py
+	mkdir -p include/generated
+	$(kconfiglib)/genconfig.py --header-path include/generated/config.h \
+				   --sync-deps include/config
+
+include/config/auto.conf:
+	$(error No .config found. Run 'make menuconfig' first)

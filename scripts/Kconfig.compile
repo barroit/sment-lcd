@@ -1,0 +1,96 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+menu "Compile options"
+
+choice
+	prompt "Compiler optimization"
+	default CC_OPTIMIZE_NONE if ENABLE_DEBUG
+	default CC_OPTIMIZE_O2
+
+config CC_OPTIMIZE_NONE
+	bool "Don't optimize (-O0)"
+
+config CC_OPTIMIZE_O1
+	bool "Optimize a bit (-O1)"
+
+config CC_OPTIMIZE_O2
+	bool "Optimize for performance (-O2)"
+
+config CC_OPTIMIZE_O3
+	bool "Optimize more aggressively for performance (-O3)"
+
+endchoice # Compiler optimization
+
+config ENABLE_DEBUG
+	bool "Debug program"
+
+config DEBUG_INFO
+	bool
+
+choice
+	prompt "Debug information"
+	depends on ENABLE_DEBUG
+	default DEBUG_INFO_DWARF5
+
+config DEBUG_INFO_NONE
+	bool "Don't generate debug information"
+
+config DEBUG_INFO_DWARF4
+	bool "Generate DWARF version 4 debug information"
+	select DEBUG_INFO
+
+config DEBUG_INFO_DWARF5
+	bool "Generate DWARF version 5 debug information"
+	select DEBUG_INFO
+
+endchoice # Debug information
+
+choice
+	prompt "Compress debug information"
+	depends on DEBUG_INFO
+
+config DEBUG_INFO_COMPRESS_NONE
+	bool "Don't compress debug information"
+
+config DEBUG_INFO_COMPRESS_ZLIB
+	bool "Compress debug information with zlib"
+	depends on $(cc-has-feature,GZ_ZLIB)
+	depends on $(ld-has-feature,COMPRESS_DEBUG_SECTIONS_ZLIB)
+
+config DEBUG_INFO_COMPRESS_ZSTD
+	bool "Compress debug information with zstd"
+	depends on $(cc-has-feature,GZ_ZSTD)
+	depends on $(ld-has-feature,COMPRESS_DEBUG_SECTIONS_ZSTD)
+
+endchoice # Compress debug information
+
+config WARN_LARGE_ALLOC
+	bool "Warn on large allocations"
+	default ENABLE_DEBUG
+
+config LARGE_ALLOC
+	hex "Large allocation warning threshold"
+	default 0x80000
+	depends on WARN_LARGE_ALLOC
+
+config IGNORE_ANNOT_LEAKS
+	bool "Suppress leak reports for annotated objects"
+
+config ENABLE_SANITIZER
+	bool "Build with sanitizers"
+	select IGNORE_ANNOT_LEAKS
+	default ENABLE_DEBUG
+
+config ENABLE_TEST
+	bool "Add test targets"
+	default ENABLE_DEBUG
+
+menu "List options"
+
+config VALIDATE_LIST_MUTATION
+	bool "Validate list modifications"
+	default ENABLE_DEBUG
+
+endmenu # List options
+
+endmenu # Compile options

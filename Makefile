@@ -1,0 +1,119 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+name := smentlcd
+version := 0.0.0
+
+ifneq ($(filter extra-prereqs,$(.FEATURES)),extra-prereqs)
+  $(error GNU Make >= 4.3 is required. Your Make version is $(MAKE_VERSION))
+endif
+
+MAKEFLAGS += -rR
+
+build/$(name):
+
+stage3_tagets := %.o %/d.h %/entry miku build/$(name) build/t/unit/%
+current_tagets := $(or $(MAKECMDGOALS),miku)
+
+print_db := $(findstring p,$(firstword $(MAKEFLAGS)))
+no_print_db := $(if $(print_db),,1)
+on_stage3 := $(and $(no_print_db),$(filter $(stage3_tagets),$(current_tagets)))
+
+define mv_stale
+	test -f $(2) && cmp -s $(1) $(2) && test -z "$(3)" || \
+	{ mv $(1) $(2) && touch $(2); }
+endef
+
+include scripts/Makefile.probe
+include scripts/Makefile.kconfig
+
+ifneq ($(on_stage3),)
+  # We're compiling/linking.
+
+  include build/probe/cc/features
+  include build/probe/ld/features
+  include include/config/auto.conf
+  include build/cmdtree
+
+  CC != cat build/probe/cc/program
+  LD != cat build/probe/ld/id
+
+  USE_GCC != test $$(cat build/probe/cc/id) = gcc && printf y
+  USE_CLANG != test $$(cat build/probe/cc/id) = clang && printf y
+endif
+
+include scripts/Makefile.flags
+
+lib-obj-y += build/lib/atexit.o \
+	     build/lib/err.o \
+	     build/lib/list.o \
+	     build/lib/log.o \
+	     build/lib/parse_argv.o \
+	     build/lib/rio.o \
+	     build/lib/strbuf.o \
+	     build/lib/strlist.o \
+	     build/lib/strtox.o \
+	     build/lib/strutil.o \
+	     build/lib/unicode.o \
+	     build/lib/unicode_width.o \
+	     build/lib/xalloc.o
+
+ifeq ($(CC_HAS_REALLOCARRAY),)
+  lib-obj-y += build/lib/patch/reallocarray.o
+endif
+
+ifeq ($(CC_HAS_STRCHRNUL),)
+  lib-obj-y += build/lib/patch/strchrnul.o
+endif
+
+link-y :=
+
+include scripts/Makefile.command
+
+ifneq ($(or $(print_db),$(CONFIG_ENABLE_TEST)),)
+  include scripts/Makefile.unitest
+  include scripts/Makefile.cmdtest
+endif
+
+-include $(lib-obj-y:.o=.d1)
+-include $(cmd-obj-y:.o=.d1)
+
+build/$(name): build/command/main/entry
+	cp $< $@
+
+$(lib-obj-y):
+
+build/%.o: %.c \
+	   include/generated/build.h include/generated/features.h \
+	   build/.flags.cc build/.flags.ld
+	mkdir -p $(@D)
+	$(CC) $(CFLAGS) $(addprefix -include ,$(filter include/generated/% \
+						       include/command/%,$^)) \
+	      -c $< -o $@
+
+command/%_entry.c: | command/%.c
+	./scripts/gen-command-entry.sh $(basename $(*F)) >$@
+
+build/%.d1: build/%.d
+	@./scripts/fixconfig.sh $(shell grep .h: $< | tr -d : | \
+					sed s,include/generated/config.h,,) \
+				$*.c <$< >$@
+
+lib/unicode_width.c:
+	./scripts/gen-unicode_width_c.py >$@
+
+.force:
+
+.PHONY: clean distclean
+
+distclean:
+	rm -rf build include/command include/config include/generated
+
+clean:
+	{ \
+		find build/lib build/command \
+		     \( -name '*.o' -o -name '*.d' -o -name 'entry' \) \
+		     -exec rm {} + ; \
+		find include/command -type f -exec rm {} + ; \
+		find command -name '*_entry.c' -exec rm {} + ; \
+	} 2>/dev/null
+	rm -f build/.commands build/cmdtree build/$(name)

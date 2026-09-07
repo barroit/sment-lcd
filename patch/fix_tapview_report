@@ -1,0 +1,11 @@
+--- a/tapview/tapview	2026-04-21 15:03:44
++++ b/tapview/tapview	2026-04-21 15:04:04
+@@ -175,7 +175,7 @@
+ 		    if directive "$line" [Ss][Kk][Ii][Pp]
+ 		    then
+ 			ship_line "$line"
+-			echo "${report}"
++			printf '%s' "${report}"
+ 			exit 1	# Not specified in the standard whether this should exit 1 or 0
+ 		    fi
+ 		    context_set plan "${line}"
