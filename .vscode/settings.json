@@ -7,15 +7,18 @@
    },
    "search.exclude": {
       "**/kconfiglib": true,
+      "**/libusb": true,
       "**/tapview": true,
    },
    "git.ignoredRepositories": [
       "kconfiglib",
+      "libusb",
       "tapview",
    ],
    "C_Cpp.default.includePath": [
       "${workspaceFolder}/include",
       "${workspaceFolder}/t/unit/include",
+      "${workspaceFolder}/libusb/libusb",
    ],
    "C_Cpp.default.forcedInclude": [
       "${workspaceFolder}/include/generated/build.h",

@@ -8,3 +8,8 @@
 	path = tapview
 	url = git@gitlab.com:esr/tapview.git
 	ignore = dirty
+
+[submodule "libusb"]
+	path = libusb
+	url = git@github.com:libusb/libusb.git
+	ignore = untracked

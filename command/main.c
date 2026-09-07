@@ -6,8 +6,7 @@
 #include "atexit.h"
 #include "parse_argv.h"
 #include "unicode.h"
-
-#include <stdio.h>
+#include "compiler.h"
 
 static const char *usage[] = {
 	"test",
@@ -30,5 +29,6 @@ int cmd_main(int argc, const char **argv)
 
 	argc = pa_parse_args(argc, argv, opts, usage, 0);
 	cmd(argc, argv);
-	return 0;
+
+	unreachable();
 }

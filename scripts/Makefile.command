@@ -1,8 +1,13 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-build/command/%/entry: $(lib-obj-y) $(link-y)
+build/command/%/entry: $(lib-obj-y) $(link-y) $(pkg-static-y)
 	mkdir -p $(@D)
-	$(CC) $(LDFLAGS) -fuse-ld=$(LD) $(filter %.o %.a,$^) \
+	$(CC) $(LDFLAGS) -fuse-ld=$(LD) \
+	      $(filter %.o,$^) \
+	      $(filter %.a,$^) \
+	      $(filter-out $(shell pkg-config --libs $(filter %.pc,$^)),\
+			   $(shell pkg-config --static --libs \
+			   		      $(filter %.pc,$^))) \
 	      -o $@
 
 include/command/%/d.h:

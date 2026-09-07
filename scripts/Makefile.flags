@@ -70,6 +70,8 @@ CFLAGS += -Wno-parentheses
 
 CFLAGS += -iquote include
 
+CFLAGS += -isystem libusb/libusb
+
 CFLAGS += -include include/generated/config.h
 
 CFLAGS += -D_GNU_SOURCE

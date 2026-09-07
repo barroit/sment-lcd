@@ -65,7 +65,8 @@ ifeq ($(CC_HAS_STRCHRNUL),)
   lib-obj-y += build/lib/patch/strchrnul.o
 endif
 
-link-y :=
+link-y := build/libusb/libusb-1.0.a
+pkg-static-y := libusb/libusb-1.0.pc
 
 include scripts/Makefile.command
 
@@ -79,6 +80,14 @@ endif
 
 build/$(name): build/command/main/entry
 	cp $< $@
+
+build/libusb/libusb-1.0.a: libusb/libusb-1.0.a
+	mkdir -p $(@D)
+	ln -f $< $@
+
+libusb/libusb-1.0.a libusb/libusb-1.0.pc:
+	$(error No $@ found. \
+		Run 'scripts/build-$(firstword $(subst /, ,$@)).sh' first)
 
 $(lib-obj-y):
 
