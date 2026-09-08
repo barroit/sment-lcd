@@ -15,6 +15,7 @@
       "libusb",
       "tapview",
    ],
+   "C_Cpp.default.cStandard": "gnu17",
    "C_Cpp.default.includePath": [
       "${workspaceFolder}/include",
       "${workspaceFolder}/t/unit/include",

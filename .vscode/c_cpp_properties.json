@@ -1,0 +1,15 @@
+{
+   "configurations": [
+      {
+         "name": "gcc-x86",
+         "compilerPath": "/usr/bin/gcc",
+         "intelliSenseMode": "linux-gcc-x64",
+      },
+      {
+         "name": "clang-x86",
+         "compilerPath": "/usr/bin/clang",
+         "intelliSenseMode": "linux-clang-x64",
+      },
+   ],
+   "version": 4,
+}
