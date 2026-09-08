@@ -69,9 +69,6 @@ ifeq ($(CC_HAS_STRCHRNUL),)
   lib-obj-y += build/lib/patch/strchrnul.o
 endif
 
-daemon-link-y := build/libusb/libusb-1.0.a
-daemon-pkg-y := libusb/libusb-1.0.pc
-
 include scripts/Makefile.command
 
 ifneq ($(or $(print_db),$(CONFIG_ENABLE_TEST)),)
@@ -87,14 +84,6 @@ build/$(name)d: build/daemon/main/entry
 
 build/$(name)ctl: build/ctl/main/entry
 	cp $< $@
-
-build/libusb/libusb-1.0.a: libusb/libusb-1.0.a
-	mkdir -p $(@D)
-	ln -f $< $@
-
-libusb/libusb-1.0.a libusb/libusb-1.0.pc:
-	$(error No $@ found. \
-		Run 'scripts/build-$(firstword $(subst /, ,$@)).sh' first)
 
 $(lib-obj-y):
 

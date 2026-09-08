@@ -6,8 +6,7 @@ set -e
 cd libusb
 git clean -xdf
 
-CFLAGS='-O3 -g0' ./autogen.sh --disable-udev \
-			      --enable-static --disable-shared \
+CFLAGS='-O3 -g0' ./autogen.sh --enable-static --disable-shared \
 			      --disable-examples-build --disable-tests-build
 
 make -j all
