@@ -69,6 +69,8 @@ ifeq ($(CC_HAS_STRCHRNUL),)
   lib-obj-y += build/lib/patch/strchrnul.o
 endif
 
+include scripts/Makefile.daemon
+include scripts/Makefile.ctl
 include scripts/Makefile.command
 
 ifneq ($(or $(print_db),$(CONFIG_ENABLE_TEST)),)
