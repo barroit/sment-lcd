@@ -37,5 +37,5 @@ build/ctl/.commands build/daemon/.commands:
 build/%/.commands: .force
 	@mkdir -p $(@D)
 	@trap 'rm -f .tmp-$$$$' EXIT && \
-	find ctl -type f -not -name '*_entry.c' | sort >.tmp-$$$$ && \
+	find $* -type f -not -name '*_entry.c' | sort >.tmp-$$$$ && \
 	$(call mv_stale,.tmp-$$$$,$(@),)
