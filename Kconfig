@@ -6,4 +6,4 @@ $(warn-off)
 
 source "scripts/Kconfig.compile"
 
-source "scripts/Kconfig.feature"
+source "scripts/Kconfig.runtime"
