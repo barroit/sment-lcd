@@ -23,7 +23,7 @@ void __list_die_add(const struct list_head *new,
 		bug("list_add corruption; prev->next should be next (%px), but was %px",
 		    next, prev->next);
 
-	unreachable();
+	cc_unreachable();
 }
 
 void __list_die_del(const struct list_head *entry)
@@ -41,5 +41,5 @@ void __list_die_del(const struct list_head *entry)
 		bug("list_del corruption; prev->next should be next (%px), but was %px",
 		    next, prev->next);
 
-	unreachable();
+	cc_unreachable();
 }

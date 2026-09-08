@@ -54,8 +54,8 @@
 	(a) + (b);				\
 })
 
-#define next_buf_size(x) align_down((((x) + 8) * 3) >> 1, 8)
-#define next_arr_size(x) align_down((x) + ((x) >> 3) + 6, 8)
+#define next_buf_size(x) cc_align_down((((x) + 8) * 3) >> 1, 8)
+#define next_arr_size(x) cc_align_down((x) + ((x) >> 3) + 6, 8)
 
 #define min(a, b) ((a) < (b) ? (a) : (b))
 #define max(a, b) ((a) > (b) ? (a) : (b))

@@ -19,10 +19,10 @@
 
 void sl_init(struct strlist *sl, uint64_t flags)
 {
-	if (popcount(__sl_mode(flags)) == 0)
+	if (cc_popcount(__sl_mode(flags)) == 0)
 		flags |= SL_USE_CP;
 
-	assert(popcount(__sl_mode(flags)) == 1);
+	assert(cc_popcount(__sl_mode(flags)) == 1);
 
 	sl->flags = flags;
 	list_head_init(&sl->head);
@@ -62,7 +62,7 @@ static struct strlist_item *alloc_item_cp(const char *str, size_t *__len)
 {
 	struct strlist_item *item;
 	size_t str_len = strlen(str);
-	size_t data_len = align_up(str_len + 1, alignof(*item));
+	size_t data_len = cc_align_up(str_len + 1, cc_alignof(*item));
 	char *buf = xmalloc(data_len + sizeof(*item));
 
 	item = (void *)(&buf[data_len]);
@@ -95,7 +95,7 @@ static struct strlist_item *alloc_item_sb(const char *str,
 		sb_trunc(item->sb, 0);
 	} else {
 		size_t sb_len = sizeof(struct strbuf);
-		size_t data_len = align_up(sb_len, alignof(*item));
+		size_t data_len = cc_align_up(sb_len, cc_alignof(*item));
 		char *buf = xmalloc(data_len + sizeof(*item));
 
 		item = (void *)(&buf[data_len]);

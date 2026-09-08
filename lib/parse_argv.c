@@ -150,7 +150,7 @@ static const char *default_command(struct pa_opt *opts)
 			return opt->name;
 	}
 
-	trap();
+	cc_trap();
 }
 
 static void die_no_bare(const char *s)
