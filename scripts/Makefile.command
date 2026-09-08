@@ -1,24 +1,25 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-build/command/%/entry: $(lib-obj-y) $(link-y) $(pkg-static-y)
+build/%/entry: $(lib-obj-y)
 	mkdir -p $(@D)
 	$(CC) $(LDFLAGS) -fuse-ld=$(LD) \
 	      $(filter %.o,$^) \
 	      $(filter %.a,$^) \
-	      $(filter-out $(shell pkg-config --libs $(filter %.pc,$^)),\
-			   $(shell pkg-config --static --libs \
-			   		      $(filter %.pc,$^))) \
 	      -o $@
 
-include/command/%/d.h:
+include/%/d.h:
 	mkdir -p $(@D)
-	printf '%s\n' $| | sort | ./scripts/gen-d_h.sh $*/ >$@
+	printf '%s\n' $| | sort | ./scripts/gen-d_h.sh $@ >$@
 
-build/cmdtree: build/.commands scripts/build-cmdtree.py
-	./scripts/build-cmdtree.py command/main.c >$@
+build/ctl/cmdtree build/daemon/cmdtree:
 
-build/.commands: .force
+build/%/cmdtree: build/%/.commands scripts/build-cmdtree.py
+	./scripts/build-cmdtree.py $*/main.c >$@
+
+build/ctl/.commands build/daemon/.commands:
+
+build/%/.commands: .force
 	@mkdir -p $(@D)
 	@trap 'rm -f .tmp-$$$$' EXIT && \
-	find command -type f | sort >.tmp-$$$$ && \
+	find ctl -type f -not -name '*_entry.c' | sort >.tmp-$$$$ && \
 	$(call mv_stale,.tmp-$$$$,$(@),)

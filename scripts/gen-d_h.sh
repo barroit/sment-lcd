@@ -5,13 +5,12 @@ set -e
 
 trap 'rm -f .tmp-$$' EXIT
 
-prefix=$(printf '%s' $1 | sed -e 's|^main/||' -e 's|/$|_|')
-name=$(basename $1)
+name=$(dirname $1 | cut -d/ -f3- | sed -e 's|main/|/|' -e 's|^/||' -e 's|/|_|g')
 class=$(printf '%s' $name | tr '[:lower:]' '[:upper:]')
-pretty=$(printf '%s' $1 | sed "s|^main|$(head -n1 README)|" | tr / ' ')
+pretty=$(printf '%s' $name | cut -d_ -f2- | tr _ ' ')
 
-match='s|.*/\([^/]*\).c'
-opt_replace="\tPA_OPT_CMD(\"\1\", v, cmd_$prefix\1, cmd_$prefix\1_help)"
+sed_cmd_name='s|.*/\([^/]*\).c|'
+opt_cmd_name='\tPA_OPT_CMD("\1", v, cmd_'$name'_\1, cmd_'$name'_\1_help)'
 
 cat >.tmp-$$
 
@@ -23,26 +22,15 @@ cat <<EOF
 
 #include "parse_argv.h"
 
-EOF
+$(sed $sed_cmd_name'int cmd_'$name'_\1(int argc, const char **argv);|' .tmp-$$)
+int cmd_$name(int argc, const char **argv);
 
-sed $match"|int cmd_$prefix\1(int argc, const char **argv);|" .tmp-$$
+$(sed $sed_cmd_name'extern const char *cmd_'$name'_\1_help;|' .tmp-$$)
 
-printf 'int cmd_%s(int argc, const char **argv);\n' $name
-
-printf '\n'
-
-sed $match"|extern const char *cmd_$prefix\1_help;|" .tmp-$$
-
-printf '\n'
-
-cat <<EOF
 #define CMD_${class}_CMDS(v) \\
-	PA_OPT_GROUP("${pretty}commands:"), \\
-EOF
-
-sed -e \$!$match"|$opt_replace, \\\\|" -e \$$match"|$opt_replace|" .tmp-$$
-
-cat <<EOF
+	PA_OPT_GROUP("$(head -n1 README) - $pretty commands:"), \\
+$(sed -e '$!'$sed_cmd_name"$opt_cmd_name"', \\|' \
+      -e '$'$sed_cmd_name"$opt_cmd_name"'|' .tmp-$$)
 
 #endif /* CMD_${class}_D_H */
 EOF

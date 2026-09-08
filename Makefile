@@ -9,9 +9,9 @@ endif
 
 MAKEFLAGS += -rR
 
-build/$(name):
+build/$(name): build/$(name)d build/$(name)ctl
 
-stage3_tagets := %.o %/d.h %/entry miku build/$(name) build/t/unit/%
+stage3_tagets := %.o %/d.h %/entry miku build/$(name)% build/t/unit/%
 current_tagets := $(or $(MAKECMDGOALS),miku)
 
 print_db := $(findstring p,$(firstword $(MAKEFLAGS)))
@@ -31,8 +31,11 @@ ifneq ($(on_stage3),)
 
   include build/probe/cc/features
   include build/probe/ld/features
+
   include include/config/auto.conf
-  include build/cmdtree
+
+  include build/daemon/cmdtree
+  include build/ctl/cmdtree
 
   CC != cat build/probe/cc/program
   LD != cat build/probe/ld/id
@@ -66,8 +69,8 @@ ifeq ($(CC_HAS_STRCHRNUL),)
   lib-obj-y += build/lib/patch/strchrnul.o
 endif
 
-link-y := build/libusb/libusb-1.0.a
-pkg-static-y := libusb/libusb-1.0.pc
+daemon-link-y := build/libusb/libusb-1.0.a
+daemon-pkg-y := libusb/libusb-1.0.pc
 
 include scripts/Makefile.command
 
@@ -79,7 +82,10 @@ endif
 -include $(lib-obj-y:.o=.d1)
 -include $(cmd-obj-y:.o=.d1)
 
-build/$(name): build/command/main/entry
+build/$(name)d: build/daemon/main/entry
+	cp $< $@
+
+build/$(name)ctl: build/ctl/main/entry
 	cp $< $@
 
 build/libusb/libusb-1.0.a: libusb/libusb-1.0.a
@@ -97,13 +103,14 @@ build/%.o: %.c \
 	   build/.flags.cc build/.flags.ld
 	mkdir -p $(@D)
 	$(CC) $(CFLAGS) $(addprefix -include ,$(filter include/generated/% \
-						       include/command/%,$^)) \
+						       include/ctl/% \
+						       include/daemon/%,$^)) \
 	      -c $< -o $@
 
-command/%_entry.c: | command/%.c
-	./scripts/gen-command-entry.sh $(basename $(*F)) >$@
+%_entry.c: | %.c
+	./scripts/gen-command-entry.sh $(*F) >$@
 
-build/%.d1: build/%.d
+build/%.d1: build/%.d %.c
 	@./scripts/fixconfig.sh $(shell grep .h: $< | tr -d : | \
 					sed s,include/generated/config.h,,) \
 				$*.c <$< >$@
@@ -116,14 +123,15 @@ lib/unicode_width.c:
 .PHONY: clean distclean
 
 distclean:
-	rm -rf build include/command include/config include/generated
+	rm -rf build include/daemon include/ctl include/config include/generated
 
 clean:
 	{ \
-		find build/lib build/command \
+		find build/lib build/daemon build/ctl \
 		     \( -name '*.o' -o -name '*.d' -o -name 'entry' \) \
 		     -exec rm {} + ; \
-		find include/command -type f -exec rm {} + ; \
-		find command -name '*_entry.c' -exec rm {} + ; \
+		find include/daemon include/ctl -type f -exec rm {} + ; \
+		find daemon ctl -name '*_entry.c' -exec rm {} + ; \
 	} 2>/dev/null
-	rm -f build/.commands build/cmdtree build/$(name)
+	rm -f build/daemon/.commands build/daemon/cmdtree \
+	      build/ctl/.commands build/ctl/cmdtree build/$(name)

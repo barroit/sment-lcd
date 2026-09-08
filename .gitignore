@@ -4,8 +4,10 @@
 /deps
 /scripts/__pycache__
 
-/command/**/*_entry.c
-/include/command/*
+/ctl/**/*_entry.c
+/daemon/**/*_entry.c
+/include/ctl/*
+/include/daemon/*
 /include/config/*
 /include/generated/*
 
