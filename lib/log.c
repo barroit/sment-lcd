@@ -6,6 +6,7 @@
 #include <inttypes.h>
 #include <stdint.h>
 #include <stdlib.h>
+#include <time.h>
 #include <unistd.h>
 
 #include "log.h"
@@ -71,6 +72,30 @@ void log_printf(FILE *stream, const char *prefix, const char *hint,
 
 	va_start(ap, fmt);
 	log_vprintf(stream, prefix, hint, fmt, ap);
+
+	va_end(ap);
+}
+
+void __log_record(const char *func, const char *fmt, ...)
+{
+	int err;
+	va_list ap;
+	char prefix[SZ_512];
+	struct timespec tp;
+
+	err = clock_gettime(CLOCK_MONOTONIC, &tp);
+	if (err) {
+		tp.tv_sec = 39;
+		tp.tv_nsec = 39;
+	}
+
+	snprintf(prefix, sizeof(prefix),
+		 H("[%" PRIu64 ".%" PRIu64 "] ", SGR_BOLD, SGR_GREEN)
+		 H("%s():", SGR_WHITE),
+		 (uint64_t)tp.tv_sec, (uint64_t)tp.tv_nsec / 1000, func);
+
+	va_start(ap, fmt);
+	log_vwritef(STDOUT_FILENO, prefix, NULL, fmt, ap);
 
 	va_end(ap);
 }

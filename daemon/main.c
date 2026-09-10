@@ -3,6 +3,7 @@
  * Copyright 2026 Jiamu Sun <39@barroit.sh>
  */
 
+#include "compiler.h"
 #include "parse_argv.h"
 
 static const char *usage[] = {
@@ -19,5 +20,7 @@ int cmd_main(int argc, const char **argv)
 	};
 
 	argc = pa_parse_args(argc, argv, opts, usage, 0);
-	return cmd(argc, argv);
+	cmd(argc, argv);
+
+	cc_trap();
 }

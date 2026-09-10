@@ -15,6 +15,8 @@
 
 extern char *strerror(int errnum);
 
+#define record(fmt, ...) __log_record(__func__, fmt, ##__VA_ARGS__)
+
 #define warn(fmt, ...) __log_warn(NULL, fmt, ##__VA_ARGS__)
 #define warn_errno(fmt, ...) warn_errno2(errno, fmt, ##__VA_ARGS__)
 #define warn_errno2(e, fmt, ...) __log_warn(strerror(e), fmt, ##__VA_ARGS__)
@@ -31,7 +33,9 @@ extern char *strerror(int errnum);
 	__log_bug("%s:%d,%s(): " fmt, __FILE__, __LINE__, __func__,	\
 		  ##__VA_ARGS__)
 
-int __log_warn(const char *hint, const char *fmt, ...)  __printf(2, 3);
+void __log_record(const char *func, const char *fmt, ...) __printf(2, 3);
+
+int __log_warn(const char *hint, const char *fmt, ...) __printf(2, 3);
 
 int __log_error(const char *hint, const char *fmt, ...) __printf(2, 3);
 
