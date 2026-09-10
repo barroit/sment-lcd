@@ -1,0 +1,28 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+.PHONY: dev_setup_unit_systemd dev_setup_unit_launchd \
+	dev_reload_unit_systemd dev_reload_unit_launchd \
+	dev_teardown_unit_systemd dev_teardown_unit_launchd
+
+dev_setup_unit_systemd:
+	systemctl --user link $$(realpath systemd/smentlcd.*)
+	systemctl --user daemon-reload
+	systemctl --user start smentlcd.service
+
+dev_setup_unit_launchd:
+	:
+
+dev_reload_unit_systemd:
+	systemctl --user daemon-reload
+	systemctl --user restart smentlcd.service
+
+dev_reload_unit_launchd:
+	:
+
+dev_teardown_unit_systemd:
+	systemctl --user stop smentlcd.service smentlcd.socket
+	systemctl --user disable smentlcd.service smentlcd.socket
+	systemctl --user daemon-reload
+
+dev_teardown_unit_launchd:
+	:

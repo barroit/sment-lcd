@@ -23,6 +23,8 @@ define mv_stale
 	{ mv $(1) $(2) && touch $(2); }
 endef
 
+include scripts/Makefile.develop
+
 include scripts/Makefile.probe
 include scripts/Makefile.kconfig
 
