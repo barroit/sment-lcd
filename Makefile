@@ -66,7 +66,7 @@ lib-obj-y += build/lib/atexit.o \
 	     build/lib/xalloc.o
 
 ifneq ($(ON_LINUX),)
-  daemon-obj-y += build/systemd/ipc.o
+  daemon-obj-y += build/systemd/ipc.o build/systemd/pcheck.o
 else ifneq ($(ON_MACOS),)
   daemon-obj-y += build/launchd/ipc.o
 endif
