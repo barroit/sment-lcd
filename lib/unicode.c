@@ -6,8 +6,8 @@
 #include <stdlib.h>
 #include <locale.h>
 
-#include "err.h"
 #include "foreach.h"
+#include "log.h"
 #include "unicode.h"
 
 unsigned int _uc_mbctype[] = {

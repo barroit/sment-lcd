@@ -11,8 +11,8 @@
 #include <string.h>
 
 #include "compiler.h"
-#include "err.h"
 #include "list.h"
+#include "log.h"
 #include "parse_argv.h"
 #include "patch/strchrnul.h"
 #include "strbuf.h"

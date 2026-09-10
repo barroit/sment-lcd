@@ -4,8 +4,8 @@
  * Copyright 2026 Jiamu Sun <39@barroit.sh>
  */
 
-#include "err.h"
 #include "list.h"
+#include "log.h"
 
 void __list_die_add(const struct list_head *new,
 		    const struct list_head *prev,

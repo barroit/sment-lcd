@@ -52,7 +52,6 @@ endif
 include scripts/Makefile.flags
 
 lib-obj-y += build/lib/atexit.o \
-	     build/lib/err.o \
 	     build/lib/list.o \
 	     build/lib/log.o \
 	     build/lib/parse_argv.o \
