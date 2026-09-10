@@ -1,0 +1,12 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+[Unit]
+Description = SpaceMouse LCD Varlink socket
+
+[Socket]
+ListenStream = %t/smentlcd.sock
+FileDescriptorName = varlink
+Service = smentlcd.service
+
+[Install]
+WantedBy = sockets.target
