@@ -41,7 +41,7 @@ unitest_routine(logf_fd_empty)
 	uniassert_is(stream);
 	fd = fileno(stream);
 
-	logf_fd(fd, NULL, NULL, "%s", "");
+	log_writef(fd, NULL, NULL, "%s", "");
 	return assert_stream_eq(stream, "\n");
 }
 
@@ -53,7 +53,7 @@ unitest_routine(logf_fd_fmt)
 	uniassert_is(stream);
 	fd = fileno(stream);
 
-	logf_fd(fd, NULL, NULL, "Hatsune %s", "Miku");
+	log_writef(fd, NULL, NULL, "Hatsune %s", "Miku");
 	return assert_stream_eq(stream, "Hatsune Miku\n");
 }
 
@@ -65,7 +65,7 @@ unitest_routine(logf_fd_prefix)
 	uniassert_is(stream);
 	fd = fileno(stream);
 
-	logf_fd(fd, "error:", NULL, "Hatsune %s", "Miku");
+	log_writef(fd, "error:", NULL, "Hatsune %s", "Miku");
 	return assert_stream_eq(stream, "error: Hatsune Miku\n");
 }
 
@@ -77,7 +77,7 @@ unitest_routine(logf_fd_hint)
 	uniassert_is(stream);
 	fd = fileno(stream);
 
-	logf_fd(fd, NULL, "try again", "Hatsune %s", "Miku");
+	log_writef(fd, NULL, "try again", "Hatsune %s", "Miku");
 	return assert_stream_eq(stream, "Hatsune Miku; try again\n");
 }
 
@@ -89,7 +89,7 @@ unitest_routine(logf_fd_prefix_hint)
 	uniassert_is(stream);
 	fd = fileno(stream);
 
-	logf_fd(fd, "fatal:", "try again", "Hatsune %s", "Miku");
+	log_writef(fd, "fatal:", "try again", "Hatsune %s", "Miku");
 	return assert_stream_eq(stream, "fatal: Hatsune Miku; try again\n");
 }
 
@@ -114,7 +114,7 @@ unitest_routine(logf_fd_overflow)
 	expect[sizeof(expect) - 2] = '\n';
 	expect[sizeof(expect) - 1] = 0;
 
-	logf_fd(fd, NULL, fill, "%s", msg);
+	log_writef(fd, NULL, fill, "%s", msg);
 	return assert_stream_eq(stream, expect);
 }
 
@@ -141,7 +141,7 @@ unitest_routine(logf_fd_prefix_overflow)
 	expect[sizeof(expect) - 2] = '\n';
 	expect[sizeof(expect) - 1] = 0;
 
-	logf_fd(fd, "x", fill, "%s", msg);
+	log_writef(fd, "x", fill, "%s", msg);
 	return assert_stream_eq(stream, expect);
 }
 

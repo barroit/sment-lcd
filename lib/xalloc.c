@@ -20,9 +20,9 @@ static inline void assert_allocated(const char *file, int line,
 	if (ptr)
 		return;
 
-	logf_fd(STDERR_FILENO, NULL, NULL,
-		"%s:%d,%s(): out of memory (tried to allocate %zu bytes)",
-		file, line, func, n);
+	log_writef(STDERR_FILENO, NULL, NULL,
+		   "%s:%d,%s(): out of memory (tried to allocate %zu bytes)",
+		   file, line, func, n);
 	abort();
 }
 
@@ -33,9 +33,9 @@ static inline void warn_large_alloc(const char *file, int line,
 	if (n < CONFIG_LARGE_ALLOC)
 		return;
 
-	logf_fd(STDERR_FILENO, NULL, NULL,
-		"%s:%d,%s(): allocated %" PRIuMAX " bytes exceeds %" PRIuMAX,
-		file, line, func, n, (uintmax_t)CONFIG_LARGE_ALLOC);
+	log_writef(STDERR_FILENO, NULL, NULL,
+		   "%s:%d,%s(): allocated %" PRIuMAX " bytes exceeds %" PRIuMAX,
+		   file, line, func, n, (uintmax_t)CONFIG_LARGE_ALLOC);
 }
 #else
 # define warn_large_alloc NOOP
@@ -89,8 +89,8 @@ char *__xstrdup(const char *file, int line, const char *func, const char *s)
 	if (buf)
 		return buf;
 
-	logf_fd(STDERR_FILENO, NULL, NULL,
-		"%s:%d,%s(): failed to duplicate string '%.10s...'",
-		file, line, func, s);
+	log_writef(STDERR_FILENO, NULL, NULL,
+		   "%s:%d,%s(): failed to duplicate string '%.10s...'",
+		   file, line, func, s);
 	abort();
 }

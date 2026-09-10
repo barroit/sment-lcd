@@ -69,8 +69,8 @@ void uc_force_utf8_ctype(void)
 	if (!try_c_locales())
 		return;
 
-	__die("either install one, or specify a valid one via LC_CTYPE",
-	      "can't set locale to UTF-8");
+	__log_die("either install one, or specify a valid one via LC_CTYPE",
+		  "can't set locale to UTF-8");
 }
 
 size_t uc_mbslen(const char *s)
