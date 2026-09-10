@@ -2,7 +2,8 @@
 
 build/ctl/%/entry: $(lib-obj-y)
 	mkdir -p $(@D)
-	$(CC) $(LDFLAGS) -fuse-ld=$(LD) $(filter %.o,$^) \
+	$(CC) $(LDFLAGS) \
+	      $(filter %.o,$^) \
 	      -o $@
 
 build/ctl/cmdtree:

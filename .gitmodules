@@ -13,3 +13,7 @@
 	path = libusb
 	url = git@github.com:libusb/libusb.git
 	ignore = untracked
+
+[submodule "libdeflate"]
+	path = libdeflate
+	url = git@github.com:ebiggers/libdeflate.git

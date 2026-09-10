@@ -42,6 +42,9 @@ ifneq ($(on_stage3),)
 
   USE_GCC != test $$(cat build/probe/cc/id) = gcc && printf y
   USE_CLANG != test $$(cat build/probe/cc/id) = clang && printf y
+
+  ON_MACOS != test $$(cat build/probe/host/id) = darwin && printf y
+  ON_LINUX != test $$(cat build/probe/host/id) = linux && printf y
 endif
 
 include scripts/Makefile.flags
@@ -60,6 +63,12 @@ lib-obj-y += build/lib/atexit.o \
 	     build/lib/unicode.o \
 	     build/lib/unicode_width.o \
 	     build/lib/xalloc.o
+
+ifneq ($(ON_LINUX),)
+  daemon-obj-y += build/systemd/ipc.o
+else ifneq ($(ON_MACOS),)
+  daemon-obj-y += build/launchd/ipc.o
+endif
 
 ifeq ($(CC_HAS_REALLOCARRAY),)
   lib-obj-y += build/lib/patch/reallocarray.o

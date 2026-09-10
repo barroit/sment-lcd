@@ -30,7 +30,7 @@ $(ut-y):
 
 build/t/unit/%.bin: build/t/unit/%.o $(ut-lib-y) $(lib-obj-y) $(link-y)
 	mkdir -p $(@D)
-	$(CC) -fuse-ld=$(LD) $(LDFLAGS) $^ -o $@
+	$(CC) $(LDFLAGS) $^ -o $@
 
 $(ut-unit-y):
 

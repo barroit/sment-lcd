@@ -12,6 +12,7 @@
    },
    "git.ignoredRepositories": [
       "kconfiglib",
+      "libdeflate",
       "libusb",
       "tapview",
    ],

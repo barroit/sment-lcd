@@ -1,21 +1,24 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-build/daemon/%/entry: $(lib-obj-y) \
-		      build/libusb/libusb-1.0.a \
-		      libusb/libusb-1.0.pc
+build/daemon/%/entry: $(lib-obj-y) $(daemon-obj-y) \
+		      build/libusb.a \
+		      build/libdeflate.a
 	mkdir -p $(@D)
-	$(CC) $(LDFLAGS) -fuse-ld=$(LD) $(filter %.o,$^) \
+	$(CC) $(LDFLAGS) \
+	      $(DAEMON_LDFLAGS) \
+	      $(filter %.o,$^) \
 	      $(filter %.a,$^) \
-	      $(filter-out $(shell pkg-config --libs $(filter %.pc,$^)),\
-			   $(shell pkg-config --static --libs \
-					      $(filter %.pc,$^))) \
 	      -o $@
 
-build/libusb/libusb-1.0.a: libusb/libusb-1.0.a
+build/libusb.a: libusb/libusb-1.0.a
 	mkdir -p $(@D)
 	ln -f $< $@
 
-libusb/libusb-1.0.a libusb/libusb-1.0.pc:
+build/libdeflate.a: libdeflate/build/libdeflate.a
+	mkdir -p $(@D)
+	ln -f $< $@
+
+libusb/libusb-1.0.a libdeflate/build/libdeflate.a:
 	$(error No $@ found. \
 		Run 'scripts/build-$(firstword $(subst /, ,$@)).sh' first)
 
