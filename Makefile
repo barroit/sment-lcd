@@ -88,7 +88,7 @@ ifneq ($(or $(print_db),$(CONFIG_ENABLE_TEST)),)
 endif
 
 -include $(lib-obj-y:.o=.d1)
--include $(cmd-obj-y:.o=.d1)
+-include $(daemon-obj-y:.o=.d1)
 
 build/$(name)d: build/daemon/main/entry
 	cp $< $@
