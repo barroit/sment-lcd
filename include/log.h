@@ -14,20 +14,27 @@
 #include "attr.h"
 
 extern char *strerror(int errnum);
+extern const char *libusb_strerror(int errcode);
 
 #define record(fmt, ...) __log_record(__func__, fmt, ##__VA_ARGS__)
 
 #define warn(fmt, ...) __log_warn(NULL, fmt, ##__VA_ARGS__)
 #define warn_errno(fmt, ...) warn_errno2(errno, fmt, ##__VA_ARGS__)
 #define warn_errno2(e, fmt, ...) __log_warn(strerror(e), fmt, ##__VA_ARGS__)
+#define warn_libusb(e, fmt, ...) \
+	__log_warn(libusb_strerror(e), fmt, ##__VA_ARGS__)
 
 #define error(fmt, ...) __log_error(NULL, fmt, ##__VA_ARGS__)
 #define error_errno(fmt, ...) error_errno2(errno, fmt, ##__VA_ARGS__)
 #define error_errno2(e, fmt, ...) __log_error(strerror(e), fmt, ##__VA_ARGS__)
+#define error_libusb(e, fmt, ...) \
+	__log_error(libusb_strerror(e), fmt, ##__VA_ARGS__)
 
 #define die(fmt, ...) __log_die(NULL, fmt, ##__VA_ARGS__)
 #define die_errno(fmt, ...) die_errno2(errno, fmt, ##__VA_ARGS__)
 #define die_errno2(e, fmt, ...) __log_die(strerror(e), fmt, ##__VA_ARGS__)
+#define die_libusb(e, fmt, ...) \
+	__log_die(libusb_strerror(e), fmt, ##__VA_ARGS__)
 
 #define bug(fmt, ...)							\
 	__log_bug("%s:%d,%s(): " fmt, __FILE__, __LINE__, __func__,	\

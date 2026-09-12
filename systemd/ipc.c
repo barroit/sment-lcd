@@ -6,12 +6,15 @@
 #include "ipc.h"
 
 #include <assert.h>
+#include <poll.h>
 #include <systemd/sd-daemon.h>
 #include <systemd/sd-event.h>
 #include <systemd/sd-json.h>
 #include <systemd/sd-varlink.h>
 
+#include "libusb.h"
 #include "log.h"
+#include "xalloc.h"
 
 #define DEFINE_METHOD_SCHEME static SD_VARLINK_DEFINE_METHOD
 #define DEFINE_INPUT_SCHEME SD_VARLINK_DEFINE_INPUT
@@ -100,6 +103,8 @@ DECLARE_METHOD(brightness)
 	};
 	struct ipc_response res = { 0 };
 
+	record("running");
+
 	field = sd_json_variant_by_key(parameters, "brightness");
 	req.brightness = sd_json_variant_integer(field);
 
@@ -167,8 +172,8 @@ void ipc_bind_exec_req(struct ipc_ctx *ctx, ipc_exec_req_fn fn)
 	ctx->exec_req = fn;
 }
 
- void ipc_listen(struct ipc_ctx *ctx)
- {
+void ipc_listen(struct ipc_ctx *ctx)
+{
 	int ret;
 
 	ret = sd_varlink_server_listen_auto(ctx->server);
@@ -180,4 +185,51 @@ void ipc_bind_exec_req(struct ipc_ctx *ctx, ipc_exec_req_fn fn)
 	ret = sd_event_loop(ctx->event);
 	if (ret < 0)
 		die_errno2(-ret, "sd_event_loop() failed");
- }
+}
+
+static int handle_event_io(sd_event_source *src, int fd, uint32_t revents,
+			   void *userdata)
+{
+	int err;
+	struct timeval tv = { 0 };
+
+	err = libusb_handle_events_timeout(NULL, &tv);
+	if (err < 0) {
+		error_libusb(-err,
+			     "libusb cannot handle pending events");
+		return -1;
+	}
+
+	return 0;
+}
+
+void *ipc_watch_pollfd(struct ipc_ctx *ctx, size_t nalloc, int fd, short events)
+{
+	int err;
+	char *buf;
+	struct sd_event_source **src;
+	uint32_t sd_events = 0;
+
+	if (events & POLLIN)
+		sd_events |= EPOLLIN;
+
+	if (events & POLLOUT)
+		sd_events |= EPOLLOUT;
+
+	buf = xmalloc(nalloc + sizeof(src));
+	src = (typeof(src))&buf[nalloc];
+
+	err = sd_event_add_io(ctx->event, src, fd, sd_events, handle_event_io,
+			      ctx);
+	if (err)
+		error_errno2(-err,
+			     "unable to add libusb pollfd %d as new I/O event source to event loop",
+			     fd);
+
+	return buf;
+}
+
+void ipc_unwatch_pollfd(struct ipc_ctx *ctx, void *src)
+{
+	sd_event_source_unref((struct sd_event_source *)src);
+}

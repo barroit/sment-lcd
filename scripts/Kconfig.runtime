@@ -6,4 +6,12 @@ config UTF8_LOCALE
 	string "Default LC_CTYPE"
 	default "$(utf8-locale)"
 
+config SMENT_VID
+	int "SpaceMouse Enterprice vendor ID"
+	default 0x256f
+
+config SMENT_PID
+	int "SpaceMouse Enterprice product ID"
+	default 0xc633
+
 endmenu # Runtime defaults

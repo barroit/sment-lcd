@@ -3,11 +3,10 @@
  * Copyright 2026 Jiamu Sun <39@barroit.sh>
  */
 
-#include <stdlib.h>
-
 #include "ipc.h"
+#include "device.h"
 
-#include <stdio.h>
+#include <stdlib.h>
 
 const char *cmd_main_start_help = "start the daemon process";
 
@@ -38,13 +37,18 @@ static void exec_req(struct ipc_request *req, struct ipc_response *res)
 
 int cmd_main_start(int argc, const char **argv)
 {
-	struct ipc_ctx *ctx;
+	struct ipc_ctx *ipc_ctx;
+	struct dev_ctx *dev_ctx;
 
-	ipc_init(&ctx);
+	ipc_init(&ipc_ctx);
+	dev_init(&dev_ctx);
 
-	ipc_bind_exec_req(ctx, exec_req);
+	dev_assign_ipc_ctx(dev_ctx, ipc_ctx);
+	dev_setup_pollfd(dev_ctx);
+	dev_enable_hotplug(dev_ctx);
 
-	ipc_listen(ctx);
+	ipc_bind_exec_req(ipc_ctx, exec_req);
+	ipc_listen(ipc_ctx);
 
 	abort();
 }

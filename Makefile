@@ -65,10 +65,16 @@ lib-obj-y += build/lib/atexit.o \
 	     build/lib/unicode_width.o \
 	     build/lib/xalloc.o
 
+daemon-obj-y += build/lib/device.o
+
 ifneq ($(ON_LINUX),)
-  daemon-obj-y += build/systemd/ipc.o build/systemd/pcheck.o
+  daemon-obj-y += build/systemd/ipc.o
 else ifneq ($(ON_MACOS),)
   daemon-obj-y += build/launchd/ipc.o
+endif
+
+ifeq ($(CONFIG_ENABLE_DEBUG),)
+  daemon-obj-y += build/systemd/pcheck.o
 endif
 
 ifeq ($(CC_HAS_REALLOCARRAY),)
